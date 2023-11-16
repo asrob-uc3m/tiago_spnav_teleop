@@ -36,17 +36,19 @@ bool SpnavController::init(hardware_interface::PositionJointInterface* hw, ros::
 
     ikSolverVel.updateInternalDataStructures();
 
-    // get joint name from the parameter server
-    std::string my_joint;
+    std::vector<std::string> joint_names;
 
-    if (!n.getParam("joint", my_joint))
+    if (!n.getParam("joint_names", joint_names))
     {
-        ROS_ERROR("Could not find joint name");
+        ROS_ERROR("Could not retrieve joint names");
         return false;
     }
 
-    // get the joint object to use in the realtime loop
-    joint_ = hw->getHandle(my_joint);  // throws on failure
+    for (const auto & joint_name : joint_names)
+    {
+        joints.push_back(hw->getHandle(joint_name));
+    }
+
     return true;
 }
 

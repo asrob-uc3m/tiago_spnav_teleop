@@ -1,6 +1,7 @@
 #ifndef __TIAGO_SPNAV_TELEOP_HPP__
 #define __TIAGO_SPNAV_TELEOP_HPP__
 
+#include <vector>
 #include <controller_interface/controller.h>
 #include <hardware_interface/joint_command_interface.h>
 #include <kdl/chain.hpp>
@@ -19,7 +20,7 @@ public:
   void stopping(const ros::Time& time);
 
 private:
-  hardware_interface::JointHandle joint_;
+  std::vector<hardware_interface::JointHandle> joints;
   KDL::Chain chain;
   KDL::ChainIkSolverVel_pinv ikSolverVel;
 };
