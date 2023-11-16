@@ -1,9 +1,12 @@
 #ifndef __TIAGO_SPNAV_TELEOP_HPP__
 #define __TIAGO_SPNAV_TELEOP_HPP__
 
+#include <array>
+#include <mutex>
 #include <vector>
 #include <controller_interface/controller.h>
 #include <hardware_interface/joint_command_interface.h>
+#include <sensor_msgs/Joy.h>
 #include <kdl/chain.hpp>
 #include <kdl/chainiksolvervel_pinv.hpp>
 
@@ -20,9 +23,15 @@ public:
   void stopping(const ros::Time& time);
 
 private:
+  void spnavCallback(const sensor_msgs::Joy::ConstPtr& msg);
+
   std::vector<hardware_interface::JointHandle> joints;
+  std::array<float, 6> joyAxes;
+  std::array<int, 2> joyButtons;
   KDL::Chain chain;
   KDL::ChainIkSolverVel_pinv ikSolverVel;
+  ros::Subscriber spnav;
+  std::mutex mtx;
 };
 
 } //namespace

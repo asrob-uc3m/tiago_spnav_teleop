@@ -1,5 +1,6 @@
 #include "tiago_spnav_teleop/tiago_spnav_teleop.hpp"
 
+#include <algorithm> // std::copy
 #include <pluginlib/class_list_macros.h>
 #include <kdl_parser/kdl_parser.hpp>
 
@@ -49,6 +50,15 @@ bool SpnavController::init(hardware_interface::PositionJointInterface* hw, ros::
         joints.push_back(hw->getHandle(joint_name));
     }
 
+    ros::topic::waitForMessage<sensor_msgs::Joy>("/spacenav/joy", n);
+    spnav = n.subscribe("/spacenav/joy", 1, &SpnavController::spnavCallback, this);
+
+    if (!spnav)
+    {
+        ROS_ERROR("Could not subscribe to /spacenav/joy");
+        return false;
+    }
+
     return true;
 }
 
@@ -62,5 +72,12 @@ void SpnavController::starting(const ros::Time& time)
 { }
 void SpnavController::stopping(const ros::Time& time)
 { }
+
+void SpnavController::spnavCallback(const sensor_msgs::Joy::ConstPtr& msg)
+{
+    std::lock_guard<std::mutex> lock(mtx);
+    std::copy(msg->axes.cbegin(), msg->axes.cend(), joyAxes.begin());
+    std::copy(msg->buttons.cbegin(), msg->buttons.cend(), joyButtons.begin());
+}
 
 PLUGINLIB_EXPORT_CLASS(tiago_controllers::SpnavController, controller_interface::ControllerBase);
