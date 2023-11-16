@@ -33,3 +33,5 @@
 
 # Miscellanea
 **/build*/
+/.vs/
+/.vscode/
