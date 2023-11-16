@@ -1,0 +1,3 @@
+spnav_controller:
+  type: "tiago_spnav_teleop/SpnavControllerPlugin"
+  joint: "arm_1_joint"
