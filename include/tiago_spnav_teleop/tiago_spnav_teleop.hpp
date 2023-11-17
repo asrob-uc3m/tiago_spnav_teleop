@@ -9,6 +9,7 @@
 #include <sensor_msgs/Joy.h>
 #include <kdl/chain.hpp>
 #include <kdl/chainiksolvervel_pinv.hpp>
+#include <kdl/jntarray.hpp>
 
 namespace tiago_controllers
 {
@@ -30,6 +31,7 @@ private:
   std::array<int, 2> joyButtons;
   KDL::Chain chain;
   KDL::ChainIkSolverVel_pinv ikSolverVel;
+  KDL::JntArray q;
   ros::Subscriber spnav;
   std::mutex mtx;
 };

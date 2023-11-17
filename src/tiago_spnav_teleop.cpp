@@ -3,7 +3,6 @@
 #include <algorithm> // std::copy
 #include <pluginlib/class_list_macros.h>
 #include <kdl_parser/kdl_parser.hpp>
-#include <kdl/jntarray.hpp>
 #include <kdl/frames.hpp>
 
 using namespace tiago_controllers;
@@ -37,6 +36,7 @@ bool SpnavController::init(hardware_interface::PositionJointInterface* hw, ros::
 
     ROS_INFO("Got chain with %d joints and %d segments", chain.getNrOfJoints(), chain.getNrOfSegments());
 
+    q.resize(chain.getNrOfJoints());
     ikSolverVel.updateInternalDataStructures();
 
     std::vector<std::string> joint_names;
@@ -66,14 +66,8 @@ bool SpnavController::init(hardware_interface::PositionJointInterface* hw, ros::
 
 void SpnavController::update(const ros::Time& time, const ros::Duration& period)
 {
-    KDL::JntArray q(chain.getNrOfJoints());
     KDL::JntArray qdot(chain.getNrOfJoints());
     KDL::Twist tw;
-
-    for (int i = 0; i < joints.size(); i++)
-    {
-        q(i) = joints[i].getPosition();
-    }
 
     {
         std::lock_guard<std::mutex> lock(mtx);
@@ -89,7 +83,7 @@ void SpnavController::update(const ros::Time& time, const ros::Duration& period)
         ROS_WARN("Convergence issue: pseudo-inverse is singular");
         break;
     case KDL::SolverI::E_SVD_FAILED:
-        ROS_WARN("Convergence issue: SVD failed");
+        ROS_ERROR("Convergence issue: SVD failed");
         return;
     case KDL::SolverI::E_NOERROR:
         break;
@@ -100,12 +94,21 @@ void SpnavController::update(const ros::Time& time, const ros::Duration& period)
 
     for (int i = 0; i < joints.size(); i++)
     {
-        joints[i].setCommand(q(i) + qdot(i) * 0.001);
+        q(i) += qdot(i) * period.toSec();
+        joints[i].setCommand(q(i));
     }
 }
 
 void SpnavController::starting(const ros::Time& time)
-{ }
+{
+    for (int i = 0; i < joints.size(); i++)
+    {
+        q(i) = joints[i].getPosition();
+    }
+
+    ROS_INFO("Initial pose: %f %f %f %f %f %f %f", q(0), q(1), q(2), q(3), q(4), q(5), q(6));
+}
+
 void SpnavController::stopping(const ros::Time& time)
 { }
 
