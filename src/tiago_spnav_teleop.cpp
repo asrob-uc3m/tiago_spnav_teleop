@@ -4,6 +4,7 @@
 #include <pluginlib/class_list_macros.h>
 #include <kdl_parser/kdl_parser.hpp>
 #include <kdl/frames.hpp>
+#include <urdf/model.h>
 
 using namespace tiago_controllers;
 
@@ -39,6 +40,14 @@ bool SpnavController::init(hardware_interface::PositionJointInterface* hw, ros::
     q.resize(chain.getNrOfJoints());
     ikSolverVel.updateInternalDataStructures();
 
+    urdf::Model model;
+
+    if (!model.initString(robot_desc_string))
+    {
+        ROS_ERROR("Failed to parse urdf file");
+        return false;
+    }
+
     std::vector<std::string> joint_names;
 
     if (!n.getParam("joint_names", joint_names))
@@ -50,6 +59,8 @@ bool SpnavController::init(hardware_interface::PositionJointInterface* hw, ros::
     for (const auto & joint_name : joint_names)
     {
         joints.push_back(hw->getHandle(joint_name));
+        jointLowerLimits.push_back(model.getJoint(joint_name)->limits->lower);
+        jointUpperLimits.push_back(model.getJoint(joint_name)->limits->upper);
     }
 
     ros::topic::waitForMessage<sensor_msgs::Joy>("/spacenav/joy", n);

@@ -27,6 +27,8 @@ private:
   void spnavCallback(const sensor_msgs::Joy::ConstPtr& msg);
 
   std::vector<hardware_interface::JointHandle> joints;
+  std::vector<double> jointUpperLimits;
+  std::vector<double> jointLowerLimits;
   std::array<float, 6> joyAxes;
   std::array<int, 2> joyButtons;
   KDL::Chain chain;

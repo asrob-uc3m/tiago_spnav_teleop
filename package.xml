@@ -17,6 +17,7 @@
     <depend>roscpp</depend>
     <depend>orocos_kdl</depend>
     <depend>kdl_parser</depend>
+    <depend>urdf</depend>
 
     <export>
         <controller_interface plugin="${prefix}/tiago_spnav_teleop_plugins.xml"/>

@@ -12,6 +12,7 @@ find_package(catkin REQUIRED COMPONENTS
     pluginlib
     roscpp
     kdl_parser
+    urdf
 )
 
 find_package(orocos_kdl REQUIRED)
