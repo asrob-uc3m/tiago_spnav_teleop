@@ -28,7 +28,7 @@ if __name__ == "__main__":
   rospy.wait_for_service('controller_manager/switch_controller')
   manager = rospy.ServiceProxy('controller_manager/switch_controller', SwitchController)
   rospy.loginfo("Switching controllers...")
-  response = manager(start_controllers=['spnav_controller'], stop_controllers=['arm_controller'], strictness=2)
+  response = manager(start_controllers=['spnav_controller'], stop_controllers=['arm_controller', 'gripper_controller'], strictness=2)
   if not response.ok:
     rospy.logfatal("Failed to switch controllers")
   rospy.loginfo("...done.")

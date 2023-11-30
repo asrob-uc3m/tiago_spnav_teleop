@@ -8,6 +8,8 @@
 
 using namespace tiago_controllers;
 
+constexpr auto JOY_GRIPPER_INCREMENT = 0.001;
+
 SpnavController::SpnavController()
     : ikSolverVel(chain)
 { }
@@ -48,19 +50,32 @@ bool SpnavController::init(hardware_interface::PositionJointInterface* hw, ros::
         return false;
     }
 
-    std::vector<std::string> joint_names;
+    std::vector<std::string> arm_joint_names;
 
-    if (!n.getParam("joint_names", joint_names))
+    if (!n.getParam("arm_joint_names", arm_joint_names))
     {
-        ROS_ERROR("Could not retrieve joint names");
+        ROS_ERROR("Could not retrieve arm joint names");
         return false;
     }
 
-    for (const auto & joint_name : joint_names)
+    for (const auto & joint_name : arm_joint_names)
     {
-        joints.push_back(hw->getHandle(joint_name));
-        jointLowerLimits.push_back(model.getJoint(joint_name)->limits->lower);
-        jointUpperLimits.push_back(model.getJoint(joint_name)->limits->upper);
+        armJoints.push_back(hw->getHandle(joint_name));
+        armJointLowerLimits.push_back(model.getJoint(joint_name)->limits->lower);
+        armJointUpperLimits.push_back(model.getJoint(joint_name)->limits->upper);
+    }
+
+    std::vector<std::string> gripper_joint_names;
+
+    if (!n.getParam("gripper_joint_names", gripper_joint_names))
+    {
+        ROS_ERROR("Could not retrieve gripper joint names");
+        return false;
+    }
+
+    for (const auto & joint_name : gripper_joint_names)
+    {
+        gripperJoints.push_back(hw->getHandle(joint_name));
     }
 
     ros::topic::waitForMessage<sensor_msgs::Joy>("/spacenav/joy", n);
@@ -103,21 +118,36 @@ void SpnavController::update(const ros::Time& time, const ros::Duration& period)
         return;
     }
 
-    for (int i = 0; i < joints.size(); i++)
+    for (int i = 0; i < armJoints.size(); i++)
     {
         q(i) += qdot(i) * period.toSec();
-        joints[i].setCommand(q(i));
+        armJoints[i].setCommand(q(i));
+    }
+
+    if (joyButtons[0])
+    {
+        for (int i = 0; i < gripperJoints.size(); i++)
+        {
+            gripperJoints[i].setCommand(gripperJoints[i].getPosition() + JOY_GRIPPER_INCREMENT);
+        }
+    }
+    else if (joyButtons[1])
+    {
+        for (int i = 0; i < gripperJoints.size(); i++)
+        {
+            gripperJoints[i].setCommand(gripperJoints[i].getPosition() - JOY_GRIPPER_INCREMENT);
+        }
     }
 }
 
 void SpnavController::starting(const ros::Time& time)
 {
-    for (int i = 0; i < joints.size(); i++)
+    for (int i = 0; i < armJoints.size(); i++)
     {
-        q(i) = joints[i].getPosition();
+        q(i) = armJoints[i].getPosition();
     }
 
-    ROS_INFO("Initial pose: %f %f %f %f %f %f %f", q(0), q(1), q(2), q(3), q(4), q(5), q(6));
+    ROS_INFO("Initial arm pose: %f %f %f %f %f %f %f", q(0), q(1), q(2), q(3), q(4), q(5), q(6));
 }
 
 void SpnavController::stopping(const ros::Time& time)
