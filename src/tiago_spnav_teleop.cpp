@@ -127,26 +127,29 @@ void SpnavController::update(const ros::Time& time, const ros::Duration& period)
         tw.rot = {joyAxes[3], joyAxes[4], joyAxes[5]};
     }
 
-    int ret = ikSolverVel->CartToJnt(q, tw, qdot);
-
-    switch (ret)
+    if (!checkReturnCode(ikSolverVel->CartToJnt(q, tw, qdot)))
     {
-    case KDL::ChainIkSolverVel_pinv::E_CONVERGE_PINV_SINGULAR:
-        ROS_WARN_THROTTLE(UPDATE_LOG_THROTTLE, "Convergence issue: pseudo-inverse is singular");
-        return;
-    case KDL::SolverI::E_SVD_FAILED:
-        ROS_ERROR_THROTTLE(UPDATE_LOG_THROTTLE, "Convergence issue: SVD failed");
-        return;
-    case KDL::SolverI::E_NOERROR:
-        break;
-    default:
-        ROS_WARN_THROTTLE(UPDATE_LOG_THROTTLE, "Convergence issue: unknown error");
         return;
     }
 
+    KDL::JntArray q_temp(q); // look ahead in case we may have ended up in a singular point at `q`
+
     for (int i = 0; i < armJoints.size(); i++)
     {
-        q(i) += qdot(i) * period.toSec();
+        q_temp(i) += qdot(i) * period.toSec();
+    }
+
+    KDL::JntArray qdot_temp(chain.getNrOfJoints());
+
+    if (!checkReturnCode(ikSolverVel->CartToJnt(q_temp, tw, qdot_temp)))
+    {
+        return;
+    }
+
+    q = q_temp; // no singular point, so update the calculated pose
+
+    for (int i = 0; i < armJoints.size(); i++)
+    {
         armJoints[i].setCommand(q(i));
     }
 
@@ -163,6 +166,24 @@ void SpnavController::update(const ros::Time& time, const ros::Duration& period)
         {
             gripperJoints[i].setCommand(gripperJoints[i].getPosition() - JOY_GRIPPER_INCREMENT);
         }
+    }
+}
+
+bool SpnavController::checkReturnCode(int ret)
+{
+    switch (ret)
+    {
+    case KDL::ChainIkSolverVel_pinv::E_CONVERGE_PINV_SINGULAR:
+        ROS_WARN_THROTTLE(UPDATE_LOG_THROTTLE, "Convergence issue: pseudo-inverse is singular");
+        return false;
+    case KDL::SolverI::E_SVD_FAILED:
+        ROS_ERROR_THROTTLE(UPDATE_LOG_THROTTLE, "Convergence issue: SVD failed");
+        return false;
+    case KDL::SolverI::E_NOERROR:
+        return true;
+    default:
+        ROS_WARN_THROTTLE(UPDATE_LOG_THROTTLE, "Convergence issue: unknown error");
+        return false;
     }
 }
 

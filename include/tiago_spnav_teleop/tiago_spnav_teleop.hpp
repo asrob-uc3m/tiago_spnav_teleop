@@ -25,6 +25,7 @@ public:
   void stopping(const ros::Time& time);
 
 private:
+  bool checkReturnCode(int returnCode);
   void spnavCallback(const sensor_msgs::Joy::ConstPtr& msg);
 
   std::vector<hardware_interface::JointHandle> armJoints;
