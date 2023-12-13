@@ -4,3 +4,5 @@ spnav_controller:
   gripper_joint_names: ["gripper_left_finger_joint", "gripper_right_finger_joint"]
   ik_solver_vel_eps: 0.01
   ik_solver_vel_max_iter: 100
+  start_link: "torso_lift_link"
+  end_link: "gripper_grasping_frame"

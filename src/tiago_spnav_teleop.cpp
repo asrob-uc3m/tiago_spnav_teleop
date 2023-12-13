@@ -41,7 +41,21 @@ bool SpnavController::init(hardware_interface::PositionJointInterface* hw, ros::
         return false;
     }
 
-    if (!tree.getChain("torso_lift_link", "arm_7_link", chain))
+    std::string start_link, end_link;
+
+    if (!n.getParam("start_link", start_link))
+    {
+        ROS_ERROR("Could not find start_link parameter");
+        return false;
+    }
+
+    if (!n.getParam("end_link", end_link))
+    {
+        ROS_ERROR("Could not find end_link parameter");
+        return false;
+    }
+
+    if (!tree.getChain(start_link, end_link, chain))
     {
         ROS_ERROR("Failed to get chain from kdl tree");
         return false;
