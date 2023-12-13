@@ -18,6 +18,7 @@ class SpnavController : public controller_interface::Controller<hardware_interfa
 {
 public:
   SpnavController();
+  ~SpnavController();
   bool init(hardware_interface::PositionJointInterface* hw, ros::NodeHandle &n);
   void update(const ros::Time& time, const ros::Duration& period);
   void starting(const ros::Time& time);
@@ -33,7 +34,7 @@ private:
   std::array<float, 6> joyAxes;
   std::array<int, 2> joyButtons;
   KDL::Chain chain;
-  KDL::ChainIkSolverVel_pinv ikSolverVel;
+  KDL::ChainIkSolverVel_pinv * ikSolverVel;
   KDL::JntArray q;
   ros::Subscriber spnav;
   std::mutex mtx;

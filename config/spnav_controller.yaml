@@ -2,3 +2,5 @@ spnav_controller:
   type: "tiago_spnav_teleop/SpnavControllerPlugin"
   arm_joint_names: ["arm_1_joint", "arm_2_joint", "arm_3_joint", "arm_4_joint", "arm_5_joint", "arm_6_joint", "arm_7_joint"]
   gripper_joint_names: ["gripper_left_finger_joint", "gripper_right_finger_joint"]
+  ik_solver_vel_eps: 0.01
+  ik_solver_vel_max_iter: 100

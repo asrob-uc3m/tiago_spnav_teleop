@@ -9,10 +9,20 @@
 using namespace tiago_controllers;
 
 constexpr auto JOY_GRIPPER_INCREMENT = 0.001;
+constexpr auto UPDATE_LOG_THROTTLE = 1.0; // [s]
 
 SpnavController::SpnavController()
-    : ikSolverVel(chain)
+    : ikSolverVel(nullptr)
 { }
+
+SpnavController::~SpnavController()
+{
+    if (ikSolverVel)
+    {
+        delete ikSolverVel;
+        ikSolverVel = nullptr;
+    }
+}
 
 bool SpnavController::init(hardware_interface::PositionJointInterface* hw, ros::NodeHandle &n)
 {
@@ -40,7 +50,23 @@ bool SpnavController::init(hardware_interface::PositionJointInterface* hw, ros::
     ROS_INFO("Got chain with %d joints and %d segments", chain.getNrOfJoints(), chain.getNrOfSegments());
 
     q.resize(chain.getNrOfJoints());
-    ikSolverVel.updateInternalDataStructures();
+
+    double eps;
+    int maxIter;
+
+    if (!n.getParam("ik_solver_vel_eps", eps))
+    {
+        ROS_ERROR("Could not find ik_solver_vel_eps parameter");
+        return false;
+    }
+
+    if (!n.getParam("ik_solver_vel_max_iter", maxIter))
+    {
+        ROS_ERROR("Could not find ik_solver_vel_max_iter parameter");
+        return false;
+    }
+
+    ikSolverVel = new KDL::ChainIkSolverVel_pinv(chain, eps, maxIter);
 
     urdf::Model model;
 
@@ -101,20 +127,20 @@ void SpnavController::update(const ros::Time& time, const ros::Duration& period)
         tw.rot = {joyAxes[3], joyAxes[4], joyAxes[5]};
     }
 
-    int ret = ikSolverVel.CartToJnt(q, tw, qdot);
+    int ret = ikSolverVel->CartToJnt(q, tw, qdot);
 
     switch (ret)
     {
     case KDL::ChainIkSolverVel_pinv::E_CONVERGE_PINV_SINGULAR:
-        ROS_WARN("Convergence issue: pseudo-inverse is singular");
-        break;
+        ROS_WARN_THROTTLE(UPDATE_LOG_THROTTLE, "Convergence issue: pseudo-inverse is singular");
+        return;
     case KDL::SolverI::E_SVD_FAILED:
-        ROS_ERROR("Convergence issue: SVD failed");
+        ROS_ERROR_THROTTLE(UPDATE_LOG_THROTTLE, "Convergence issue: SVD failed");
         return;
     case KDL::SolverI::E_NOERROR:
         break;
     default:
-        ROS_WARN("Convergence issue: unknown error");
+        ROS_WARN_THROTTLE(UPDATE_LOG_THROTTLE, "Convergence issue: unknown error");
         return;
     }
 
