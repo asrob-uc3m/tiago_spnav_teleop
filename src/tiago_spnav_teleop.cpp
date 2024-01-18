@@ -118,7 +118,6 @@ bool SpnavController::init(hardware_interface::PositionJointInterface* hw, ros::
         gripperJoints.push_back(hw->getHandle(joint_name));
     }
 
-    ros::topic::waitForMessage<sensor_msgs::Joy>("/spacenav/joy", n);
     spnav = n.subscribe("/spacenav/joy", 1, &SpnavController::spnavCallback, this);
 
     if (!spnav)

@@ -3,7 +3,7 @@
 import rospy
 import actionlib
 from play_motion_msgs.msg import PlayMotionAction, PlayMotionGoal
-from sensor_msgs.msg import JointState
+from sensor_msgs.msg import JointState, Joy
 from controller_manager_msgs.srv import SwitchController
 
 if __name__ == "__main__":
@@ -25,10 +25,13 @@ if __name__ == "__main__":
   client.wait_for_result(rospy.Duration(10.0))
   rospy.loginfo("Arm extended.")
 
+  rospy.wait_for_message("/spacenav/joy", Joy)
   rospy.wait_for_service('controller_manager/switch_controller')
   manager = rospy.ServiceProxy('controller_manager/switch_controller', SwitchController)
   rospy.loginfo("Switching controllers...")
   response = manager(start_controllers=['spnav_controller'], stop_controllers=['arm_controller', 'gripper_controller'], strictness=2)
+
   if not response.ok:
     rospy.logfatal("Failed to switch controllers")
+
   rospy.loginfo("...done.")
