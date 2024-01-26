@@ -150,6 +150,13 @@ void SpnavController::update(const ros::Time& time, const ros::Duration& period)
     for (int i = 0; i < armJoints.size(); i++)
     {
         q_temp(i) += qdot(i) * period.toSec();
+
+        if (q_temp(i) < armJointLowerLimits[i] || q_temp(i) > armJointUpperLimits[i])
+        {
+            ROS_WARN_THROTTLE(UPDATE_LOG_THROTTLE, "Joint %d out of limits: %f not in [%f, %f]",
+                                                   q_temp(i), armJointLowerLimits[i], armJointUpperLimits[i]);
+            return;
+        }
     }
 
     KDL::JntArray qdot_temp(chain.getNrOfJoints());
