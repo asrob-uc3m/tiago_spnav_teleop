@@ -1,6 +1,7 @@
 #include "tiago_spnav_teleop/tiago_spnav_teleop.hpp"
 
 #include <algorithm> // std::copy
+#include <string>
 #include <pluginlib/class_list_macros.h>
 #include <kdl_parser/kdl_parser.hpp>
 #include <kdl/frames.hpp>
@@ -154,7 +155,7 @@ void SpnavController::update(const ros::Time& time, const ros::Duration& period)
         if (q_temp(i) < armJointLowerLimits[i] || q_temp(i) > armJointUpperLimits[i])
         {
             ROS_WARN_THROTTLE(UPDATE_LOG_THROTTLE, "Joint %d out of limits: %f not in [%f, %f]",
-                                                   q_temp(i), armJointLowerLimits[i], armJointUpperLimits[i]);
+                                                   i, q_temp(i), armJointLowerLimits[i], armJointUpperLimits[i]);
             return;
         }
     }
@@ -209,12 +210,15 @@ bool SpnavController::checkReturnCode(int ret)
 
 void SpnavController::starting(const ros::Time& time)
 {
+    std::string out = "Initial arm pose:";
+
     for (int i = 0; i < armJoints.size(); i++)
     {
         q(i) = armJoints[i].getPosition();
+        out += " " + std::to_string(q(i));
     }
 
-    ROS_INFO("Initial arm pose: %f %f %f %f %f %f %f", q(0), q(1), q(2), q(3), q(4), q(5), q(6));
+    ROS_INFO("Initial arm pose: %s", out.c_str());
 }
 
 void SpnavController::stopping(const ros::Time& time)
