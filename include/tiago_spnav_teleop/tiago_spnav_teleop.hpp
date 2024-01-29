@@ -3,6 +3,7 @@
 
 #include <array>
 #include <mutex>
+#include <utility> // std::pair
 #include <vector>
 #include <controller_interface/controller.h>
 #include <hardware_interface/joint_command_interface.h>
@@ -30,8 +31,7 @@ private:
 
   std::vector<hardware_interface::JointHandle> armJoints;
   std::vector<hardware_interface::JointHandle> gripperJoints;
-  std::vector<double> armJointUpperLimits;
-  std::vector<double> armJointLowerLimits;
+  std::vector<std::pair<double, double>> armJointLimits;
   std::array<float, 6> joyAxes;
   std::array<int, 2> joyButtons;
   KDL::Chain chain;

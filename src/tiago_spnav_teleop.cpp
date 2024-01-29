@@ -102,8 +102,9 @@ bool SpnavController::init(hardware_interface::PositionJointInterface* hw, ros::
     for (const auto & joint_name : arm_joint_names)
     {
         armJoints.push_back(hw->getHandle(joint_name));
-        armJointLowerLimits.push_back(model.getJoint(joint_name)->limits->lower);
-        armJointUpperLimits.push_back(model.getJoint(joint_name)->limits->upper);
+
+        armJointLimits.emplace_back(model.getJoint(joint_name)->limits->lower,
+                                    model.getJoint(joint_name)->limits->upper);
     }
 
     std::vector<std::string> gripper_joint_names;
@@ -152,10 +153,10 @@ void SpnavController::update(const ros::Time& time, const ros::Duration& period)
     {
         q_temp(i) += qdot(i) * period.toSec();
 
-        if (q_temp(i) < armJointLowerLimits[i] || q_temp(i) > armJointUpperLimits[i])
+        if (q_temp(i) < armJointLimits[i].first || q_temp(i) > armJointLimits[i].second)
         {
             ROS_WARN_THROTTLE(UPDATE_LOG_THROTTLE, "Joint %d out of limits: %f not in [%f, %f]",
-                                                   i, q_temp(i), armJointLowerLimits[i], armJointUpperLimits[i]);
+                                                   i, q_temp(i), armJointLimits[i].first, armJointLimits[i].second);
             return;
         }
     }
