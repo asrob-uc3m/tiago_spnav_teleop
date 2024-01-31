@@ -9,12 +9,7 @@
 
 using namespace tiago_controllers;
 
-constexpr auto JOY_GRIPPER_INCREMENT = 0.001;
 constexpr auto UPDATE_LOG_THROTTLE = 1.0; // [s]
-
-SpnavController::SpnavController()
-    : ikSolverVel(nullptr)
-{ }
 
 SpnavController::~SpnavController()
 {
@@ -99,6 +94,18 @@ bool SpnavController::init(hardware_interface::PositionJointInterface* hw, ros::
         return false;
     }
 
+    if (!n.getParam("joy_arm_scale", joyArmScale))
+    {
+        ROS_ERROR("Could not retrieve joy arm scale");
+        return false;
+    }
+
+    if (!n.getParam("joy_gripper_increment", joyGripperIncrement))
+    {
+        ROS_ERROR("Could not retrieve joy gripper increment");
+        return false;
+    }
+
     for (const auto & joint_name : arm_joint_names)
     {
         armJoints.push_back(hw->getHandle(joint_name));
@@ -151,7 +158,7 @@ void SpnavController::update(const ros::Time& time, const ros::Duration& period)
 
     for (int i = 0; i < armJoints.size(); i++)
     {
-        q_temp(i) += qdot(i) * period.toSec();
+        q_temp(i) += qdot(i) * period.toSec() * joyArmScale;
 
         if (q_temp(i) < armJointLimits[i].first || q_temp(i) > armJointLimits[i].second)
         {
@@ -179,14 +186,14 @@ void SpnavController::update(const ros::Time& time, const ros::Duration& period)
     {
         for (int i = 0; i < gripperJoints.size(); i++)
         {
-            gripperJoints[i].setCommand(gripperJoints[i].getPosition() + JOY_GRIPPER_INCREMENT);
+            gripperJoints[i].setCommand(gripperJoints[i].getPosition() + joyGripperIncrement);
         }
     }
     else if (joyButtons[1])
     {
         for (int i = 0; i < gripperJoints.size(); i++)
         {
-            gripperJoints[i].setCommand(gripperJoints[i].getPosition() - JOY_GRIPPER_INCREMENT);
+            gripperJoints[i].setCommand(gripperJoints[i].getPosition() - joyGripperIncrement);
         }
     }
 }

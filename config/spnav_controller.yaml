@@ -6,3 +6,5 @@ spnav_controller:
   ik_solver_vel_max_iter: 100
   start_link: "torso_lift_link"
   end_link: "gripper_grasping_frame"
+  joy_arm_scale: 0.5
+  joy_gripper_increment: 0.002

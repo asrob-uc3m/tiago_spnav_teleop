@@ -18,8 +18,8 @@ namespace tiago_controllers
 class SpnavController : public controller_interface::Controller<hardware_interface::PositionJointInterface>
 {
 public:
-  SpnavController();
   ~SpnavController();
+
   bool init(hardware_interface::PositionJointInterface* hw, ros::NodeHandle &n);
   void update(const ros::Time& time, const ros::Duration& period);
   void starting(const ros::Time& time);
@@ -32,11 +32,18 @@ private:
   std::vector<hardware_interface::JointHandle> armJoints;
   std::vector<hardware_interface::JointHandle> gripperJoints;
   std::vector<std::pair<double, double>> armJointLimits;
+
   std::array<float, 6> joyAxes;
   std::array<int, 2> joyButtons;
+
   KDL::Chain chain;
-  KDL::ChainIkSolverVel_pinv * ikSolverVel;
+  KDL::ChainIkSolverVel_pinv * ikSolverVel {nullptr};
+
   KDL::JntArray q;
+
+  double joyArmScale {0.0};
+  double joyGripperIncrement {0.0};
+
   ros::Subscriber spnav;
   std::mutex mtx;
 };
