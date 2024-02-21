@@ -226,7 +226,7 @@ void SpnavController::starting(const ros::Time& time)
         out += " " + std::to_string(q(i));
     }
 
-    ROS_INFO("Initial arm pose: %s", out.c_str());
+    ROS_INFO("%s", out.c_str());
 }
 
 void SpnavController::stopping(const ros::Time& time)
