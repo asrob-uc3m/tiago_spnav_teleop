@@ -17,6 +17,9 @@
         <arg name="extra_gazebo_args" value="$(arg extra_gazebo_args)"/>
     </include>
 
+    <include file="$(find spacenav_node)/launch/classic.launch">
+    </include>
+
     <include file="$(find tiago_spnav_teleop)/launch/spnav_controller.launch">
     </include>
 </launch>
