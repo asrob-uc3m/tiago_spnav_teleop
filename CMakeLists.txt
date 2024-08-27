@@ -35,11 +35,9 @@ install(TARGETS ${PROJECT_NAME}
     RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
-foreach(dir config launch scripts)
-    install(DIRECTORY ${dir}
-            DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
-    )
-endforeach()
+install(DIRECTORY config launch
+        DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+)
 
 install(PROGRAMS scripts/init_spnav.py
                  scripts/stop_spnav.py
