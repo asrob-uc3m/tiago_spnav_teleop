@@ -42,7 +42,10 @@ foreach(dir config launch scripts)
 endforeach()
 
 install(PROGRAMS scripts/init_spnav.py
-        DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+                 scripts/stop_spnav.py
+        DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
 
 install(FILES tiago_spnav_teleop_plugins.xml
-        DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
+        DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+)
