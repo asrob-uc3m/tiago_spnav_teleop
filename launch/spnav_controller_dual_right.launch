@@ -1,0 +1,9 @@
+<launch>
+    <rosparam file="$(find tiago_spnav_teleop)/config/spnav_motions_dual.yaml" command="load" />
+    <node name="init_spnav" pkg="tiago_spnav_teleop" type="init_spnav.py" output="screen" args="--dual right"/>
+
+    <rosparam command="load" file="$(find tiago_spnav_teleop)/config/spnav_controller_dual_right.yaml"/>
+    <node name="spnav_controller_spawner"
+          pkg="controller_manager" type="spawner" output="screen"
+          args="--stopped spnav_controller"/>
+</launch>

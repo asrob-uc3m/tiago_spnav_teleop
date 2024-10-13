@@ -1,5 +1,5 @@
 <launch>
-    <rosparam file="$(find tiago_spnav_teleop)/config/tiago_spnav_motions.yaml" command="load" />
+    <rosparam file="$(find tiago_spnav_teleop)/config/spnav_motions.yaml" command="load" />
     <node name="init_spnav" pkg="tiago_spnav_teleop" type="init_spnav.py" output="screen"/>
 
     <rosparam command="load" file="$(find tiago_spnav_teleop)/config/spnav_controller.yaml"/>
