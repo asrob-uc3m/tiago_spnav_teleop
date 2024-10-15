@@ -25,11 +25,11 @@ if __name__ == "__main__":
   else: # TIAGo
     default_controllers = ["arm_controller", "gripper_controller"]
 
-  rospy.wait_for_service('/controller_manager/list_controllers')
-  rospy.wait_for_service('/controller_manager/switch_controller')
+  rospy.wait_for_service("/controller_manager/list_controllers")
+  rospy.wait_for_service("/controller_manager/switch_controller")
 
-  manager_list = rospy.ServiceProxy('/controller_manager/list_controllers', ListControllers)
-  manager_switch = rospy.ServiceProxy('/controller_manager/switch_controller', SwitchController)
+  manager_list = rospy.ServiceProxy("/controller_manager/list_controllers", ListControllers)
+  manager_switch = rospy.ServiceProxy("/controller_manager/switch_controller", SwitchController)
 
   controllers = manager_list()
 

@@ -17,4 +17,3 @@ spnav_controller_left:
   end_link: "gripper_left_grasping_frame"
   joy_arm_scale: 0.5
   joy_gripper_increment: 0.002
-  prefix: "/left"

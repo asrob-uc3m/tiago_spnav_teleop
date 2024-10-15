@@ -9,7 +9,6 @@
 
 using namespace tiago_controllers;
 
-constexpr auto NS_SPNAV = "/tiago_spnav";
 constexpr auto UPDATE_LOG_THROTTLE = 1.0; // [s]
 
 SpnavController::~SpnavController()
@@ -126,14 +125,6 @@ bool SpnavController::init(hardware_interface::PositionJointInterface* hw, ros::
     for (const auto & joint_name : gripper_joint_names)
     {
         gripperJoints.push_back(hw->getHandle(joint_name));
-    }
-
-    std::string prefix;
-
-    if (!n.getParam("prefix", prefix) && prefix != "/left" && prefix != "/right")
-    {
-        ROS_ERROR("Could not retrieve prefix parameter or illegal value");
-        return false;
     }
 
     spnav = n.subscribe("spacenav/joy", 1, &SpnavController::spnavCallback, this);
