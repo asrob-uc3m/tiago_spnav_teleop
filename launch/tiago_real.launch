@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <launch>
+    <rosparam file="$(find tiago_spnav_teleop)/config/spnav_motions.yaml" command="load" />
+
     <include file="$(find tiago_spnav_teleop)/launch/spnav_controller.launch">
     </include>
 </launch>

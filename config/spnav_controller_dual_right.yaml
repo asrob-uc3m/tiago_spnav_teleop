@@ -1,4 +1,4 @@
-spnav_controller:
+spnav_controller_right:
   type: "tiago_spnav_teleop/SpnavControllerPlugin"
   arm_joint_names:
   - "arm_right_1_joint"
@@ -17,3 +17,4 @@ spnav_controller:
   end_link: "gripper_right_grasping_frame"
   joy_arm_scale: 0.5
   joy_gripper_increment: 0.002
+  prefix: "/right"

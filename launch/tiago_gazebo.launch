@@ -8,16 +8,18 @@
     <arg name="base_type" default="pmb2"/>
 
     <include file="$(find tiago_gazebo)/launch/tiago_gazebo.launch">
-        <arg name="end_effector" default="$(arg end_effector)"/>
-        <arg name="gui" default="$(arg gui)"/>
-        <arg name="debug" default="$(arg debug)"/>
+        <arg name="end_effector" value="$(arg end_effector)"/>
+        <arg name="gui" value="$(arg gui)"/>
+        <arg name="debug" value="$(arg debug)"/>
         <arg name="public_sim" value="true"/>
-        <arg name="tuck_arm" default="false"/>
-        <arg name="base_type" default="$(arg base_type)"/>
+        <arg name="tuck_arm" value="false"/>
+        <arg name="base_type" value="$(arg base_type)"/>
         <arg name="extra_gazebo_args" value="$(arg extra_gazebo_args)"/>
     </include>
 
-    <include file="$(find spacenav_node)/launch/classic.launch">
+    <rosparam file="$(find tiago_spnav_teleop)/config/spnav_motions.yaml" command="load" />
+
+    <include file="$(find tiago_spnav_teleop)/launch/spnav_mouse.launch" ns="spnav_controller">
     </include>
 
     <include file="$(find tiago_spnav_teleop)/launch/spnav_controller.launch">

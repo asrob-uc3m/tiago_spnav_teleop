@@ -1,9 +1,48 @@
 play_motion:
-  controllers:
-  - arm_right_controller
-  - torso_controller
-
   motions:
+    extend:
+      joints:
+      - arm_left_1_joint
+      - arm_left_2_joint
+      - arm_left_3_joint
+      - arm_left_4_joint
+      - arm_left_5_joint
+      - arm_left_6_joint
+      - arm_left_7_joint
+      - arm_right_1_joint
+      - arm_right_2_joint
+      - arm_right_3_joint
+      - arm_right_4_joint
+      - arm_right_5_joint
+      - arm_right_6_joint
+      - arm_right_7_joint
+      - torso_lift_joint
+      points:
+      - positions: [0.53, 0.74, 1.99, 1.51, 0.46, 0.84, -1.09, 0.53, 0.74, 1.99, 1.51, 0.46, 0.84, -1.09, 0.15]
+        time_from_start: 5.0
+      meta:
+        name: "Extend"
+        usage: spnav
+        description: "Extend both arms"
+
+    extend_left:
+      joints:
+      - arm_left_1_joint
+      - arm_left_2_joint
+      - arm_left_3_joint
+      - arm_left_4_joint
+      - arm_left_5_joint
+      - arm_left_6_joint
+      - arm_left_7_joint
+      - torso_lift_joint
+      points:
+      - positions: [0.53, 0.74, 1.99, 1.51, 0.46, 0.84, -1.09, 0.15]
+        time_from_start: 5.0
+      meta:
+        name: "Extend left"
+        usage: spnav
+        description: "Extend left arm"
+
     extend_right:
       joints:
       - arm_right_1_joint
@@ -19,5 +58,5 @@ play_motion:
         time_from_start: 5.0
       meta:
         name: "Extend right"
-        usage: demo
+        usage: spnav
         description: "Extend right arm"

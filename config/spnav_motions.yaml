@@ -1,8 +1,4 @@
 play_motion:
-  controllers:
-  - arm_controller
-  - torso_controller
-
   motions:
     extend:
       joints:
@@ -19,5 +15,5 @@ play_motion:
         time_from_start: 5.0
       meta:
         name: Extend
-        usage: demo
+        usage: spnav
         description: "Extend arm"

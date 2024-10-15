@@ -1,0 +1,10 @@
+<launch>
+    <arg name="arm"/>
+
+    <node name="init_spnav" pkg="tiago_spnav_teleop" type="init_spnav.py" output="screen" args="--arm $(arg arm)"/>
+
+    <rosparam command="load" file="$(find tiago_spnav_teleop)/config/spnav_controller_dual_$(arg arm).yaml"/>
+    <node name="spnav_controller_spawner"
+          pkg="controller_manager" type="spawner" output="screen"
+          args="--stopped spnav_controller_$(arg arm)"/>
+</launch>
