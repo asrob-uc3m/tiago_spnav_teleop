@@ -1,0 +1,20 @@
+spnav_controller_right:
+  type: "tiago_spnav_teleop/SpnavControllerPlugin"
+  arm_joint_names:
+  - "arm_right_1_joint"
+  - "arm_right_2_joint"
+  - "arm_right_3_joint"
+  - "arm_right_4_joint"
+  - "arm_right_5_joint"
+  - "arm_right_6_joint"
+  - "arm_right_7_joint"
+  gripper_joint_names:
+  - "gripper_right_left_finger_joint"
+  - "gripper_right_right_finger_joint"
+  ik_solver_vel_eps: 0.01
+  ik_solver_vel_max_iter: 100
+  start_link: "torso_lift_link"
+  end_link: "gripper_right_grasping_frame"
+  joy_arm_scale: 0.5
+  joy_gripper_increment: 0.002
+  prefix: "/right"

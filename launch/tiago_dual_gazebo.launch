@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<launch>
+    <arg name="end_effector_left" default="pal-gripper"/>
+    <arg name="end_effector_right" default="pal-gripper"/>
+    <arg name="gui" default="true"/>
+    <arg name="debug" default="false"/>
+    <arg name="extra_gazebo_args" default=""/>
+    <arg name="base_type" default="pmb2"/>
+    <arg name="arm" default="both"/>
+
+    <include file="$(find tiago_dual_gazebo)/launch/tiago_dual_gazebo.launch">
+        <arg name="end_effector_left" value="$(arg end_effector_left)"/>
+        <arg name="end_effector_right" value="$(arg end_effector_right)"/>
+        <arg name="gui" value="$(arg gui)"/>
+        <arg name="debug" value="$(arg debug)"/>
+        <arg name="public_sim" value="true"/>
+        <arg name="tuck_arm" value="false"/>
+        <arg name="base_type" value="$(arg base_type)"/>
+        <arg name="extra_gazebo_args" value="$(arg extra_gazebo_args)"/>
+    </include>
+
+    <rosparam file="$(find tiago_spnav_teleop)/config/spnav_motions_dual.yaml" command="load" />
+
+    <include file="$(find tiago_spnav_teleop)/launch/spnav_mouse.launch"
+             if="$(eval arm == 'left' or arm == 'both')"
+             ns="spnav_controller_left">
+    </include>
+
+    <include file="$(find tiago_spnav_teleop)/launch/spnav_mouse.launch"
+             if="$(eval arm == 'right' or arm == 'both')"
+             ns="spnav_controller_right">
+    </include>
+
+    <include file="$(find tiago_spnav_teleop)/launch/spnav_controller_dual.launch"
+             if="$(eval arm == 'left' or arm == 'both')">
+        <arg name="arm" value="left"/>
+    </include>
+
+    <include file="$(find tiago_spnav_teleop)/launch/spnav_controller_dual.launch"
+             if="$(eval arm == 'right' or arm == 'both')">
+        <arg name="arm" value="right"/>
+    </include>
+</launch>
