@@ -3,10 +3,7 @@ cmake_minimum_required(VERSION 3.0)
 project(tiago_spnav_teleop LANGUAGES CXX)
 
 find_package(catkin REQUIRED COMPONENTS
-    actionlib
-    play_motion_msgs
     sensor_msgs
-    controller_manager_msgs
     controller_interface
     hardware_interface
     pluginlib
