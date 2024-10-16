@@ -22,6 +22,9 @@
 
     <rosparam file="$(find tiago_spnav_teleop)/config/spnav_motions_dual.yaml" command="load" />
 
+    <node name="init_spnav" pkg="tiago_spnav_teleop" type="init_spnav.py" output="screen"
+          args="--arm $(arg arm)"/>
+
     <include file="$(find tiago_spnav_teleop)/launch/spnav_mouse.launch"
              if="$(eval arm == 'left' or arm == 'both')"
              ns="spnav_controller_left">

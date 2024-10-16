@@ -15,7 +15,7 @@ if __name__ == "__main__":
   args, unknown = parser.parse_known_args()
 
   if args.arm is not None: # TIAGo++
-    if args.arm not in ["left", "right"]:
+    if args.arm not in ["left", "right", "both"]:
       rospy.logfatal("Invalid argument for --arm: %s" % args.arm)
       exit(1)
 
@@ -23,17 +23,22 @@ if __name__ == "__main__":
       limb = "left arm"
       motion_name = "extend_left"
       default_controllers = ["arm_left_controller", "gripper_left_controller"]
-      spnav_controller = "spnav_controller_left"
+      spnav_controllers = ["spnav_controller_left"]
     elif args.arm == "right":
       limb = "right arm"
       motion_name = "extend_right"
       default_controllers = ["arm_right_controller", "gripper_right_controller"]
-      spnav_controller = "spnav_controller_right"
+      spnav_controllers = ["spnav_controller_right"]
+    elif args.arm == "both":
+      limb = "both arms"
+      motion_name = "extend"
+      default_controllers = ["arm_left_controller", "gripper_left_controller", "arm_right_controller", "gripper_right_controller"]
+      spnav_controllers = ["spnav_controller_left", "spnav_controller_right"]
   else: # TIAGo
     limb = "arm"
     motion_name = "extend"
     default_controllers = ["arm_controller", "gripper_controller"]
-    spnav_controller = "spnav_controller"
+    spnav_controllers = ["spnav_controller"]
 
   rospy.loginfo("Waiting for play_motion...")
   client = actionlib.SimpleActionClient("/play_motion", PlayMotionAction)
@@ -52,11 +57,13 @@ if __name__ == "__main__":
   client.wait_for_result(rospy.Duration(10.0))
   rospy.loginfo("Arm extended.")
 
-  rospy.wait_for_message("%s/spacenav/joy" % spnav_controller, Joy)
+  for controller in spnav_controllers:
+    rospy.wait_for_message("%s/spacenav/joy" % controller, Joy)
+
   rospy.wait_for_service("/controller_manager/switch_controller")
   manager = rospy.ServiceProxy("/controller_manager/switch_controller", SwitchController)
   rospy.loginfo("Switching controllers...")
-  response = manager(start_controllers=[spnav_controller], stop_controllers=default_controllers, strictness=2)
+  response = manager(start_controllers=spnav_controllers, stop_controllers=default_controllers, strictness=2)
 
   if not response.ok:
     rospy.logfatal("Failed to switch controllers")

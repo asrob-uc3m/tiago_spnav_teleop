@@ -1,7 +1,6 @@
 <launch>
-    <node name="init_spnav" pkg="tiago_spnav_teleop" type="init_spnav.py" output="screen"/>
-
     <rosparam command="load" file="$(find tiago_spnav_teleop)/config/spnav_controller.yaml"/>
+
     <node name="spnav_controller_spawner"
           pkg="controller_manager" type="spawner" output="screen"
           args="--stopped spnav_controller"/>
