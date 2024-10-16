@@ -5,7 +5,13 @@
 
     <rosparam file="$(find tiago_spnav_teleop)/config/spnav_motions_dual.yaml" command="load" />
 
-    <include file="$(find tiago_spnav_teleop)/launch/spnav_controller_dual.launch">
-        <arg name="arm" value="$(arg arm)"/>
+    <include file="$(find tiago_spnav_teleop)/launch/spnav_controller_dual.launch"
+             if="$(eval arm == 'left' or arm == 'both')">
+        <arg name="arm" value="left"/>
+    </include>
+
+    <include file="$(find tiago_spnav_teleop)/launch/spnav_controller_dual.launch"
+             if="$(eval arm == 'right' or arm == 'both')">
+        <arg name="arm" value="right"/>
     </include>
 </launch>
