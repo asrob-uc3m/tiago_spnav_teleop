@@ -66,15 +66,15 @@ Append `__ns:=/spnav_controller_right` or `__ns:=/spnav_controller_right` to the
 
 ### For single-arm TIAGo
 
-Inside the robot:
+After you `ssh` into the robot:
 
 ```
 roslaunch tiago_spnav_teleop tiago_real.launch
 ```
 
-### For single-arm TIAGo
+### For dual-arm TIAGo++
 
-Inside the robot:
+After you `ssh` into the robot:
 
 ```
 roslaunch tiago_spnav_teleop tiago_dual_real.launch arm:=right
