@@ -1,6 +1,6 @@
 # tiago_spnav_teleop
 
-TIAGO (and TIAGo++) arm teleoperation with 3Dconnexion's SpaceMouse.
+TIAGo (and TIAGo++) arm teleoperation with 3Dconnexion's SpaceMouse.
 
 ## Running in simulation
 
@@ -42,15 +42,51 @@ roslaunch tiago_spnav_teleop tiago_dual_gazebo.launch arm:=right
 
 Alternatively, use `arm:=left` or `arm:=both` to achieve the obvious result.
 
-### Post-demo actions
+## Running on the real robot
 
-If you want to restore the default controllers after closing this application, run:
+Upload the project to your active workspace and build it using the `deploy.py` script (but without deploying it yet):
 
 ```
-rosrun tiago_spnav_teleop stop_spnav.py
+rosrun pal_deploy deploy.py -u pal -p tiago_spnav_teleop $(hostname)
 ```
 
-Append `--arm left`, `--arm right` or `--arm both` correspondingly if using TIAGo++.
+Press `n` when asked to rsync, then copy the command displayed at the bottom, replace `pal` with `root`, and run it. Make sure to reboot the robot at least once in order to let ROS find the plugin library at the next start.
+
+### Instantiating the 3D mouse controller
+
+On an external PC connected to the same WiFi (check that `ROS_IP` points at your IP inside said network):
+
+```
+export ROS_MASTER_URI=http://10.68.0.1:11311
+export ROS_IP=$(hostname -I | awk '{print $1}')
+roslaunch tiago_spnav_teleop spnav_mouse.launch
+```
+
+Append `__ns:=/spnav_controller_right` or `__ns:=/spnav_controller_right` to the latter command if using TIAGo++. Launch it twice (using different `left`/`right` namespaces) in case you have two devices and want to use both arms.
+
+### For single-arm TIAGo
+
+Inside the robot:
+
+```
+roslaunch tiago_spnav_teleop tiago_real.launch
+```
+
+### For single-arm TIAGo
+
+Inside the robot:
+
+```
+roslaunch tiago_spnav_teleop tiago_dual_real.launch arm:=right
+```
+
+Alternatively, use `arm:=left` or `arm:=both` to achieve the obvious result.
+
+## Important notes and post-demo actions
+
+- Upon initialization, the robot will extend the requested arm. Make sure its path is free of obstacles.
+- The FreeSpacenav implementation that powers ROS 3D mouse controllers doesn't allow communicating with more than a single device on the same machine. This means that, if you wish to bimanipulate TIAGo++ with two devices, you will need to issue `spnav_mouse.launch` on different machines (one of them could be the robot itself as long as you `apt install spacenavd ros-$(echo $ROS_DISTRO)-spacenav-node` and plug the device in one of its external USB ports), assign different ROS namespaces (e.g. `__ns:==/spnav_controller_right`) and check communications (`rostopic echo /spnav_controller_right/spacenav/joy`).
+- If you want to restore the default controllers after closing this application, run `rosrun tiago_spnav_teleop stop_spnav.py`. Append `--arm left`, `--arm right` or `--arm both` correspondingly if using TIAGo++.
 
 ## Citation
 
