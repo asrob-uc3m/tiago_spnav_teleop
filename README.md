@@ -6,7 +6,7 @@ TIAGo (and TIAGo++) arm teleoperation with 3Dconnexion's SpaceMouse.
 
 We recommend Docker. It is assumed that you have cloned this repository inside your current working directory.
 
-#### For single-arm TIAGo
+### For single-arm TIAGo
 
 ```
 docker run -it --privileged --network host -e DISPLAY \
